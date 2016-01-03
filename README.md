@@ -4,8 +4,16 @@ PKV is an implementation of the Partial Key Verification pattern for product key
 
 Contrary to Brandon's example, it offers variable matrixes, which can be chosen at key generation time.
 
-It will come with a command line tool which generates go code to include in your application offering functions to verify the chosen portion and the checksum of the key.
+It comes with a command line tool which generates go code to include in your application offering functions to verify the chosen portion and the checksum of the key.
 
+
+## Installation
+
+`go get -u "github.com/mwmahlberg/pkv"`
+
+## Usage
+
+ > Please ***NEVER*** include the package into your software if you are not planning to write a key **generator**
 
 
 
