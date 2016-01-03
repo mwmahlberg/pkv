@@ -32,10 +32,10 @@ Use the `pkv` command line tool inside your package directory.
  1. Call `pkv init`. This creates a file named `pkvkey.json` with key parameters used to generate the actual product keys. ***Never, ever make this file publicly available!***
  2. Call `pkv gencode -k [1-4]`. The flag denotes the key part to be checked. `pkv` will generate the necessary code in a subdirectory called – you guessed it – pkv which looks like
  
-       $GOPATH/src/you.com/foo/bar/pkv
-                                    └── verify
-                                        ├── k.go
-                                        └── key.go
+         $GOPATH/src/you.com/foo/bar/pkv
+                                       └── verify
+                                           ├── k.go
+                                           └── key.go
 
  3. Import the package inside your code with an *absolute* import and check the product key:
  
