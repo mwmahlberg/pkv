@@ -39,27 +39,30 @@ Use the `pkv` command line tool inside your package directory.
 
  3. Import the package inside your code with an *absolute* import and check the product key:
  
-     package main
+         package main
      
-     import pkv "you.com/foo/bar/pkv/verify"
+         import pkv "you.com/foo/bar/pkv/verify"
      
-     var k string
-     var bl []uint64
+         var k string
+         var bl []uint64
      
-     func main() {
-       k = getProductKey()
-       if err := pkv.KeyChecksum(k); err != nil {
-		     reportKeyProblemsAndExit(k)
+         func main() {
+       
+             k = getProductKey()
+
+             if err := pkv.KeyChecksum(k); err != nil {
+                 reportKeyProblemsAndExit(k)
 	     }
-       bl = getBlacklistedKeysFromSomewhereYouDeemApproriate()
-       otherFunction()
-     }
+	   
+             bl = getBlacklistedKeysFromSomewhereYouDeemApproriate()
+               otherFunction()
+         }
      
-     func otherFunction(){
-     	if err := pkv.Key(k,bl); err != nil {
+         func otherFunction(){
+     	    if err := pkv.Key(k,bl); err != nil {
      		reportKeyProblemsEndExit(k)
-     	}
-     }
+     	    }
+         }
  4. To generate a key, simply call `pkv genkey -s 123456`. The value for `-s` is called seed and identifies the generated key uniquely. Furthermore, this is the value you need to blacklist a product key. So make sure you keep track of the seed you used for generating a product key for a user! The combination of `pkvkey.json` and the seed can be used to regenerate a key.
 
 
