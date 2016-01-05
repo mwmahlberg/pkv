@@ -13,38 +13,48 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
+/*
+The cmd package contains the sources of the "pkv" utility and should not be imported.
+*/
 package cmd
 
 import (
-	"encoding/json"
+	"encoding/gob"
 	"fmt"
 	"os"
 
 	pkv "github.com/mwmahlberg/pkv/generate"
-	"io/ioutil"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 const (
-	keyfile = "./pkvkey.json"
+	defaultKeyfilePath = "./pkv.key"
 )
 
-var cfgFile string
+var (
+	cfgFile string
+	keyfile string
+	k       int
+	seed    uint64
+	stdout  bool
+)
+
+var ()
 
 // This represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
-	Use:   "partkey",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your application. For example:
+	Use:   "pkv",
+	Short: "product key generation",
+	Long: `
+pkv generates product keys and the code you need to verify them with the go programming language.
 
-Cobra is a Cli library for Go that empowers applications. This
-application is a tool to generate the needed files to quickly create a Cobra
-application.`,
-	// Uncomment the following line if your bare application has an action associated with it
-	//	Run: func(cmd *cobra.Command, args []string) { },
+For product code generation and verification, the Partial Key Verification scheme is used.
+
+To start, first create a secret matrix file with the "init" command. This matrix is the basis for all keys
+you generate. Never publish it, and keep backups of it.
+`,
 }
 
 //Execute adds all child commands to the root command sets flags appropriately.
@@ -56,49 +66,26 @@ func Execute() {
 	}
 }
 
-func init() {
-	cobra.OnInitialize(initConfig)
-	// Here you will define your flags and configuration settings
-	// Cobra supports Persistent Flags which if defined here will be global for your application
+func readKeyFile(path string) (key *pkv.KeyMatrix) {
 
-//	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.partkey.yaml)")
+	var (
+		file *os.File
+		dec  *gob.Decoder
+		err  error
+	)
 
-	// Cobra also supports local flags which will only run when this action is called directly
-
-}
-
-// Read in config file and ENV variables if set.
-func initConfig() {
-	if cfgFile != "" { // enable ability to specify config file via flag
-		viper.SetConfigFile(cfgFile)
-	}
-
-	viper.SetConfigName(".partkey") // name of config file (without extension)
-	viper.AddConfigPath("$HOME")    // adding home directory as first search path
-	viper.AutomaticEnv()            // read in environment variables that match
-
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	}
-}
-
-func readKeyFile() (key *pkv.PartialKey) {
-	b, err := ioutil.ReadFile(keyfile)
-
-	if err != nil {
-		fmt.Printf("Could not read keyfile '%s'\n", keyfile)
-		fmt.Printf("Have you called 'init'?\n\n")
-		RootCmd.Usage()
+	if file, err = os.OpenFile(path, os.O_RDONLY, 0); err != nil {
+		fmt.Printf("Error opening key file '%s': %s", path, err)
 		os.Exit(1)
 	}
 
-	key = &pkv.PartialKey{}
+	dec = gob.NewDecoder(file)
+	key = &pkv.KeyMatrix{}
 
-	if err := json.Unmarshal(b, key); err != nil {
-		fmt.Printf("Error while reading key data: %v\n", err)
+	if err = dec.Decode(&key); err != nil {
+		fmt.Printf("Error reading key file '%s': %s", path, err)
 		os.Exit(1)
 	}
-	
+
 	return
 }

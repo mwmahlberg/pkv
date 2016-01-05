@@ -32,24 +32,19 @@ func Key(key string,bl []uint64) error {
 }
 `
 	keyCheckFileName = "./pkv/verify/k.go"
-	)
-
-var (
-	k      int
-	stdout bool
-	tmpl   *template.Template
 )
+
+var tmpl *template.Template
 
 // genkeyCmd respresents the genkey command
 var genCodeCmd = &cobra.Command{
 	Use:   "gencode",
 	Short: "generates the code needed to check the selected part of the key",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Long: `
 
-Cobra is a Cli library for Go that empowers applications. This
-application is a tool to generate the needed files to quickly create a Cobra
-application.`,
+A subpackage will be created in the current directory which provides
+the code necessary to check the specified part of the product key.
+Each product key consists of four key parts.`,
 	Run: genCode,
 }
 
@@ -66,6 +61,7 @@ func init() {
 	//	genkeyCmd.Flags().StringP("seed","s","","Seed value")
 	genCodeCmd.Flags().IntVarP(&k, "key", "k", 0, "key to check in generated code [1-4]")
 	genCodeCmd.Flags().BoolVarP(&stdout, "print", "p", false, "print generated code instead of writing it to files")
+	genCodeCmd.Flags().StringVarP(&keyfile, "file", "f", defaultKeyfilePath, "path to your matrix file")
 	tmpl = template.Must(template.New("Key").Parse(keycheck))
 
 }
@@ -89,20 +85,20 @@ func genCode(cmd *cobra.Command, args []string) {
 		RestoreAsset("pkv", "verify/key.go")
 	}
 
-	key := readKeyFile()
+	key := readKeyFile(keyfile)
 
 	kc := Keychecker{Idx: k - 1, Iv: key.Matrix[k-1]}
 
 	var out *os.File
 	var err error
-	
+
 	if stdout {
 		out = os.Stdout
 	} else {
-		out, err = os.OpenFile(keyCheckFileName, os.O_CREATE|os.O_WRONLY|os.O_TRUNC,0644)
-		
+		out, err = os.OpenFile(keyCheckFileName, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+
 		if err != nil {
-			fmt.Printf("Can not write output file '%s': %v\n",keyCheckFileName,err)
+			fmt.Printf("Can not write output file '%s': %v\n", keyCheckFileName, err)
 			os.Exit(1)
 		}
 	}

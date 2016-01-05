@@ -65,5 +65,4 @@ Use the `pkv` command line tool inside your package directory.
          }
  4. To generate a key, simply call `pkv genkey -s 123456`. The value for `-s` is called seed and identifies the generated key uniquely. Furthermore, this is the value you need to blacklist a product key. So make sure you keep track of the seed you used for generating a product key for a user! The combination of `pkvkey.json` and the seed can be used to regenerate a key.
 
-
 [pkv]: http://www.brandonstaggs.com/2007/07/26/implementing-a-partial-serial-number-verification-system-in-delphi/

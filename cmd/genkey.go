@@ -23,20 +23,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	seed uint64
-)
+var lseed *uint32
 
 // genkeyCmd respresents the genkey command
 var genkeyCmd = &cobra.Command{
 	Use:   "genkey",
 	Short: "generates a product key",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a Cli library for Go that empowers applications. This
-application is a tool to generate the needed files to quickly create a Cobra
-application.`,
+	Long: `Generates a product key from the specified matrix and seed
+Note that the seed must be unique per customer, so that you are able to blacklist individual keys.`,
 	Run: genKey}
 
 func init() {
@@ -50,21 +44,27 @@ func init() {
 	// Cobra supports local flags which will only run when this command is called directly
 	// genkeyCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle" )
 
-	genkeyCmd.Flags().Uint64VarP(&seed, "seed", "s", 0, "seed for key. Must be > 0")
+	// BUG(mwmahlberg): We have to convert the seed and it's usages to uint32, not just the input 
+	 lseed = genkeyCmd.Flags().Uint32P("seed", "s", 0, "seed for key. Must be > 0")
+	
+	 genkeyCmd.Flags().StringVarP(&keyfile,"file","f",defaultKeyfilePath,"path to keyfile")
+//	t := *lseed
 }
 
 func genKey(cmd *cobra.Command, args []string) {
+	seed = uint64(*lseed)
 
 	if seed < 1 {
+		fmt.Println("Seed can not be smaller than 1!")
 		cmd.Usage()
 		os.Exit(0)
 	}
 
-	k := readKeyFile()
+	k := readKeyFile(keyfile)
 
-	pk := pkv.PartialKey{Matrix: k.Matrix}
+	pk := pkv.KeyMatrix{Matrix: k.Matrix}
 	
-	s := pk.GetKey(seed)
+	s := pk.GetKey(uint64(*lseed))
 	if err := pkv.CheckCompleteKey(s,k.Matrix); err != nil {
 		panic(err)
 	}

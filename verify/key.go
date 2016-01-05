@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 
+// GetCheckSum generates hex encoded hash sum of the given bytes.
 func GetCheckSum(i []byte) []byte {
 	left := 0x0056
 	right := 0x00AF
@@ -42,10 +43,13 @@ func checkKeyChecksumByte(k []byte) (err error) {
 	return
 }
 
+// KeyChecksum validates that the checksum of the product key is correct
+// Note that this only validates wether the key was entered correctly,
+// not if it is a valid generated product key.
 func KeyChecksum(key string) (err error) {
 	
 	if len(key) != 24 {
-		return errors.New("Invalid key length")
+		return errors.New("invalid key length")
 	}
 	
 	k := strings.Replace(key, "-", "", -1)
@@ -56,6 +60,7 @@ func KeyChecksum(key string) (err error) {
 
 }
 
+// GetKeyByte generates a a byte representing a key part.
 func GetKeyByte(seed uint64, a, b, c uint8) byte {
 
 	var r uint64
@@ -76,6 +81,7 @@ func GetKeyByte(seed uint64, a, b, c uint8) byte {
 	return buf.Bytes()[0]
 }
 
+// KeyPart validates wether the chosen key part was generated with the KeyMatrix
 func KeyPart(key string, part int, f, s, t uint8, bl []uint64) (err error) {
 
 	if err := KeyChecksum(key); err != nil {
@@ -90,11 +96,11 @@ func KeyPart(key string, part int, f, s, t uint8, bl []uint64) (err error) {
 		return err
 	}
 
-	d, _ := binary.Uvarint(b)
+	d,_ := binary.Uvarint(b)
 	
 	for _,b := range bl {
 		if d == b {
-			return errors.New("Key blacklisted")
+			return errors.New("key blacklisted")
 		}
 	} 
 

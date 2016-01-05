@@ -15,7 +15,7 @@
 //
 
 /*
-	Package generate implements the generator part of PKV
+Package generate implements the generator part of pkv.
 */
 package generate
 
@@ -28,16 +28,18 @@ import (
 	"regexp"
 	"strings"
 
-	. "github.com/mwmahlberg/pkv/verify"
+	pkv "github.com/mwmahlberg/pkv/verify"
 )
 
-type PartialKey struct {
+// The KeyMatrix is the private part of your product keys.
+type KeyMatrix struct {
 	Matrix [][3]uint8 `json:"matrix"`
 }
 
-func NewKey() PartialKey {
+// NewKey generates a new KeyMatrix using sufficiently secure random numbers.
+func NewKey() KeyMatrix {
 
-	pk := PartialKey{}
+	pk := KeyMatrix{}
 	var m [][3]uint8
 	m = make([][3]uint8, 4)
 
@@ -59,20 +61,22 @@ func NewKey() PartialKey {
 	pk.Matrix = m
 	return pk
 }
-
-func (pk *PartialKey) IV(k, v int) uint8 {
+ 
+func (pk *KeyMatrix) iv(k, v int) uint8 {
 	return pk.Matrix[k][v]
 }
-func (pk *PartialKey) GetKey(seed uint64) string {
+
+// GetKey generates a new product key based on the seed provided
+func (pk *KeyMatrix) GetKey(seed uint64) string {
 	k := make([]byte, 10)
 	binary.PutUvarint(k, seed)
 
-	k[3] = GetKeyByte(seed, pk.IV(0, 0), pk.IV(0, 1), pk.IV(0, 2))
+	k[3] = pkv.GetKeyByte(seed, pk.iv(0, 0), pk.iv(0, 1), pk.iv(0, 2))
 
-	k[4] = GetKeyByte(seed, pk.IV(1, 0), pk.IV(1, 1), pk.IV(1, 2))
-	k[5] = GetKeyByte(seed, pk.IV(2, 0), pk.IV(2, 1), pk.IV(2, 2))
-	k[6] = GetKeyByte(seed, pk.IV(3, 0), pk.IV(3, 1), pk.IV(3, 2))
-	cs := GetCheckSum(k[:7])
+	k[4] = pkv.GetKeyByte(seed, pk.iv(1, 0), pk.iv(1, 1), pk.iv(1, 2))
+	k[5] = pkv.GetKeyByte(seed, pk.iv(2, 0), pk.iv(2, 1), pk.iv(2, 2))
+	k[6] = pkv.GetKeyByte(seed, pk.iv(3, 0), pk.iv(3, 1), pk.iv(3, 2))
+	cs := pkv.GetCheckSum(k[:7])
 	k[7] = cs[0]
 	k[8] = cs[1]
 	k[9] = cs[2]
@@ -84,6 +88,7 @@ func (pk *PartialKey) GetKey(seed uint64) string {
 	return strings.Join(parts, "-")
 }
 
+// CheckCompleteKey validates each key part of a product key
 func CheckCompleteKey(key string, matrix [][3]uint8) (err error) {
 
 	k := strings.Replace(key, "-", "", -1)
@@ -94,14 +99,13 @@ func CheckCompleteKey(key string, matrix [][3]uint8) (err error) {
 		return err
 	}
 
-	d, _ := binary.Uvarint(b)
+	d,_ := binary.Uvarint(b)
 
 	err = errors.New("invalid key")
-	
-	
+
 	for i := 0; i < 4; i++ {
-		if b[i+3] != GetKeyByte(d, matrix[i][0], matrix[i][1], matrix[i][2]) {
-			return errors.New(fmt.Sprintf("Invalid key %d",i+1))
+		if b[i+3] != pkv.GetKeyByte(d, matrix[i][0], matrix[i][1], matrix[i][2]) {
+			return fmt.Errorf("invalid key %d",i+1)
 		}
 	}
 
