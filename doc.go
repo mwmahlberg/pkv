@@ -1,4 +1,4 @@
-//go:generate go-bindata -o cmd/bindata.go -ignore .*_test.go -pkg cmd ./verify
+//go:generate go-bindata -o cmd/bindata.go -ignore generator.*|.*_test.go -pkg cmd -prefix internal ./internal
 
 // Copyright ©2016 Markus W Mahlberg <markus@mahlberg.io>
 //
@@ -72,40 +72,39 @@ The "-k" flag denotes the key part you want to check. your directory should look
 	
 	example.com/
 	└── cool
-		└── pkv
-		    └── verify
-		        ├── k.go
-		        └── key.go	
+		└── internal
+	        ├── pkvcheck.go
+	        └── pkvtools.go	
 
 
 The code generated needs to be imported and provides several functions,
 but only two are of importance, as shown below:
 	
-	package cool
+	package main
 	
 	import (
-		pkv "example.com/cool/pkv/verify"
+		"example.com/cool/internal"
 	)
 		
 	func main() {
 		var key       string = getKeyFromSomewhere()
 		var blacklist []uint64 = loadBlacklistFromServer()
 			
-		if err := pkv.KeyChecksum(key); err != nil {
-			reportKeyProblems(key)
+		if err := internal.KeyChecksum(key); err != nil {
+			panic(err)
 		}
-			
-		if err := pkv.Key(key,blacklist); err != nil {
-			reportKeyProblems(key)
+
+		if err := internal.Key(key, blacklist); err != nil {
+			panic(err)
 		}
 			
 	}
 	
-The pkv.KeyChecksum(string) function provides easy checking for the general correctnes of the product key.
+The KeyChecksum(string) function provides easy checking for the general correctnes of the product key.
 You might want to use it to check wether the key was entered correctly.
 Note that this does not provide any security, as a valid checksum is relatively easy to compute.
 		
-The pkv.Key(key,blacklist) actually does the product key verification.
+The Key(key,blacklist) actually does the product key verification.
 		
 Now you are done and have a product key generator and validation!
 	

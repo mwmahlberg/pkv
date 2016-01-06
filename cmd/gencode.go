@@ -18,20 +18,20 @@ package cmd
 import (
 	"fmt"
 	"os"
-	//	"path/filepath"
+	"path/filepath"
 	"text/template"
 
 	"github.com/spf13/cobra"
 )
 
 const (
-	keycheck = `package verify
+	keycheck = `package internal
 
 func Key(key string,bl []uint64) error {
 	return KeyPart(key,{{ .Idx }},{{ index .Iv 0 }},{{ index .Iv 1 }},{{ index .Iv 2 }},bl)
 }
 `
-	keyCheckFileName = "./pkv/verify/k.go"
+	keyCheckFileName = "pkvcheck.go"
 )
 
 var tmpl *template.Template
@@ -77,12 +77,16 @@ func genCode(cmd *cobra.Command, args []string) {
 		cmd.Usage()
 		os.Exit(1)
 	}
+	wd, _ := os.Getwd()
+	p := filepath.Join(wd, "internal")
 
 	if stdout {
-		data, _ := Asset("verify/key.go")
+		
+		data, _ := Asset("pkvtools.go")
 		fmt.Println(string(data))
+		
 	} else {
-		RestoreAsset("pkv", "verify/key.go")
+		RestoreAsset(p, "pkvtools.go")
 	}
 
 	key := readKeyFile(keyfile)
@@ -95,7 +99,7 @@ func genCode(cmd *cobra.Command, args []string) {
 	if stdout {
 		out = os.Stdout
 	} else {
-		out, err = os.OpenFile(keyCheckFileName, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+		out, err = os.OpenFile(filepath.Join(p, keyCheckFileName), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
 
 		if err != nil {
 			fmt.Printf("Can not write output file '%s': %v\n", keyCheckFileName, err)

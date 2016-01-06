@@ -33,39 +33,41 @@ This installs the package (which is not so interesting) and the command line too
 Use the `pkv.v1` command line tool inside your package directory.
 
  1. Call `pkv.v1 init`. This creates a file named `pkv.key` with key parameters used to generate the actual product keys. ***Never, ever make this file publicly available!***
- 2. Call `pkv.v1 gencode -k [1-4]`. The flag denotes the key part to be checked. `pkv.v1` will generate the necessary code in a subdirectory called – you guessed it – pkv which looks like
- 
-         $GOPATH/src/you.com/foo/bar/pkv
-                                       └── verify
-                                           ├── k.go
-                                           └── key.go
+ 2. Call `pkv.v1 gencode -k [1-4]`. The flag denotes the key part to be checked. `pkv.v1` will generate the necessary code in a subdirectory:
+ 		
+     $GOPATH/example.com/you/cool
+								└── internal
+	        					    ├── pkvcheck.go
+	        					    └── pkvtools.go	
+         
 
  3. Import the package inside your code with an *absolute* import and check the product key:
  
-         package main
-     
-         import pkv "you.com/foo/bar/pkv/verify"
-     
-         var k string
-         var bl []uint64
-     
-         func main() {
-       
-             k = getProductKey()
+	package main
+	
+	import (
+	    "fmt"
+		"example.com/cool/internal"
+	)
+		
+	func main() {
+		var key       string = getKeyFromSomewhere()
+		var blacklist []uint64 = loadBlacklistFromServer()
+			
+		if err := internal.KeyChecksum(key); err != nil {
+		    fmt.Println("Key checksum verification failed.")
+		    fmt.Println("Possibly an error during entering the product key")
+			panic(err)
+		}
 
-             if err := pkv.KeyChecksum(k); err != nil {
-                 reportKeyProblemsAndExit(k)
-	     }
-	   
-             bl = getBlacklistedKeysFromSomewhereYouDeemApproriate()
-               otherFunction()
-         }
-     
-         func otherFunction(){
-     	    if err := pkv.Key(k,bl); err != nil {
-     		reportKeyProblemsEndExit(k)
-     	    }
-         }
+		if err := internal.Key(key, blacklist); err != nil {
+			fmt.Println("Key verification failed.")
+		    fmt.Println("Possibly a tampered or backlisted key.")
+			panic(err)
+		}
+			
+	}
+	
  4. To generate a key, simply call `pkv.v1 genkey -s 123456`. The value for `-s` is called seed and identifies the generated key uniquely. Furthermore, this is the value you need to blacklist a product key. So make sure you keep track of the seed you used for generating a product key for a user! The combination of `pkv.key` and the seed can be used to regenerate a key.
 
 [pkv]: http://www.brandonstaggs.com/2007/07/26/implementing-a-partial-serial-number-verification-system-in-delphi/

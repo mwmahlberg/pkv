@@ -20,7 +20,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	pkv "gopkg.in/mwmahlberg/pkv.v1/generate"
+	pkv "gopkg.in/mwmahlberg/pkv.v1/internal"
 )
 
 var lseed *uint32

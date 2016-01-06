@@ -17,7 +17,7 @@
 /*
 Verify provides the code to verify product keys.
 */
-package verify
+package internal
 
 import (
 	"bytes"
@@ -75,6 +75,10 @@ func KeyChecksum(key string) (err error) {
 
 	b, err := hex.DecodeString(k)
 
+	if err != nil {
+		return
+	}
+
 	return checkKeyChecksumByte(b)
 
 }
@@ -109,11 +113,8 @@ func KeyPart(key string, part int, f, s, t uint8, bl []uint64) (err error) {
 
 	k := strings.Replace(key, "-", "", -1)
 
-	b, err := hex.DecodeString(k)
-
-	if err != nil {
-		return err
-	}
+	// hex.decode was already tested at KeyChecksum
+	b, _ := hex.DecodeString(k)
 
 	d,_ := binary.Uvarint(b)
 	
