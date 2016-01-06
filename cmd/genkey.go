@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"os"
 
-	pkv "github.com/mwmahlberg/pkv/generate"
 	"github.com/spf13/cobra"
+	pkv "gopkg.in/mwmahlberg/pkv.v1/generate"
 )
 
 var lseed *uint32
@@ -44,11 +44,11 @@ func init() {
 	// Cobra supports local flags which will only run when this command is called directly
 	// genkeyCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle" )
 
-	// BUG(mwmahlberg): We have to convert the seed and it's usages to uint32, not just the input 
-	 lseed = genkeyCmd.Flags().Uint32P("seed", "s", 0, "seed for key. Must be > 0")
-	
-	 genkeyCmd.Flags().StringVarP(&keyfile,"file","f",defaultKeyfilePath,"path to keyfile")
-//	t := *lseed
+	// BUG(mwmahlberg): We have to convert the seed and it's usages to uint32, not just the input
+	lseed = genkeyCmd.Flags().Uint32P("seed", "s", 0, "seed for key. Must be > 0")
+
+	genkeyCmd.Flags().StringVarP(&keyfile, "file", "f", defaultKeyfilePath, "path to keyfile")
+	//	t := *lseed
 }
 
 func genKey(cmd *cobra.Command, args []string) {
@@ -63,9 +63,9 @@ func genKey(cmd *cobra.Command, args []string) {
 	k := readKeyFile(keyfile)
 
 	pk := pkv.KeyMatrix{Matrix: k.Matrix}
-	
+
 	s := pk.GetKey(uint64(*lseed))
-	if err := pkv.CheckCompleteKey(s,k.Matrix); err != nil {
+	if err := pkv.CheckCompleteKey(s, k.Matrix); err != nil {
 		panic(err)
 	}
 	fmt.Println(s)

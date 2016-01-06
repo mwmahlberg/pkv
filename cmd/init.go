@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mwmahlberg/pkv/generate"
 	"github.com/spf13/cobra"
+	"gopkg.in/mwmahlberg/pkv.v1/generate"
 )
 
 // initCmd respresents the init command

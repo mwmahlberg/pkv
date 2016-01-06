@@ -28,7 +28,7 @@ import (
 	"regexp"
 	"strings"
 
-	pkv "github.com/mwmahlberg/pkv/verify"
+	pkv "gopkg.in/mwmahlberg/pkv.v1/verify"
 )
 
 // The KeyMatrix is the private part of your product keys.
@@ -61,7 +61,7 @@ func NewKey() KeyMatrix {
 	pk.Matrix = m
 	return pk
 }
- 
+
 func (pk *KeyMatrix) iv(k, v int) uint8 {
 	return pk.Matrix[k][v]
 }
@@ -99,13 +99,13 @@ func CheckCompleteKey(key string, matrix [][3]uint8) (err error) {
 		return err
 	}
 
-	d,_ := binary.Uvarint(b)
+	d, _ := binary.Uvarint(b)
 
 	err = errors.New("invalid key")
 
 	for i := 0; i < 4; i++ {
 		if b[i+3] != pkv.GetKeyByte(d, matrix[i][0], matrix[i][1], matrix[i][2]) {
-			return fmt.Errorf("invalid key %d",i+1)
+			return fmt.Errorf("invalid key %d", i+1)
 		}
 	}
 
