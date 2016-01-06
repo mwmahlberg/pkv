@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/mwmahlberg/pkv.svg)](https://travis-ci.org/mwmahlberg/pkv)
 # PKV – Partial Key Verification
 
 PKV is an implementation of the Partial Key Verification pattern for product keys as described by [Brandon Stagg in "Implementing a Partial Serial Number Verification System in Delphi"][pkv] for the Go programming language.
