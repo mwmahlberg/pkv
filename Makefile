@@ -28,7 +28,7 @@ clean:
 cmd/bindata.go: 
 	$(GENERATE)
 
-build:
+build: cmd/bindata.go
 	$(BUILD)
 	
 install: cmd/bindata.go

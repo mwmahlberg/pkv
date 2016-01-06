@@ -1,3 +1,5 @@
+//go:generate go-bindata -o cmd/bindata.go -ignore .*_test.go -pkg cmd ./verify
+
 // Copyright ©2016 Markus W Mahlberg <markus@mahlberg.io>
 //
 //
@@ -12,7 +14,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
+
 
 /*
 The package PKV provides a command line tool to generate,
@@ -40,15 +42,15 @@ will help you to create keys and generate the according validation code for your
 	
 Using the pkv utility is pretty straightforward. First, you need to install it
 		
-	$ go get -u "github.com/mwmahlberg/pkv"
+	$ go get -u "gopkg.in/mwmahlberg/pkv.v1"
 	
-Then, you need to create the secret matrix and store it in a JSON file. The secret matrix is
+Then, you need to create the secret matrix and store it in a file. The secret matrix is
 what makes the product keys you generate unique. You should never ever make this publicly
 available.
 	
 Of course, the pkv utility generates this file for you:
 	
-	$ pkv init -f /path/to/save/dir/pkv.key
+	$ pkv.v1 init -f /path/to/save/dir/pkv.key
 	    
 This will generate a random matrix using the "cryptographically secure pseudorandom number generator"
 from "crypto/rand". It is stored in GOB format (see below).
@@ -64,7 +66,7 @@ Lifting this limitation is on the roadmap, but slightly less than 2.1 million ke
 Lastly you must generate the code for verifying the product keys:
 	
 	$ cd $GOPATH/src/you.com/cool
-	$ pkv gencode -f /path/to/pkv.key -k 1
+	$ pkv.v1 gencode -f /path/to/pkv.key -k 1
 		
 The "-k" flag denotes the key part you want to check. your directory should look like this:
 	
