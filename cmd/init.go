@@ -16,13 +16,13 @@
 package cmd
 
 import (
+	"crypto/rand"
 	"encoding/gob"
-
 	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
-	"gopkg.in/mwmahlberg/pkv.v1/generate"
+	generate "gopkg.in/mwmahlberg/pkv.v1/internal"
 )
 
 // initCmd respresents the init command
@@ -60,7 +60,7 @@ func initialize(cmd *cobra.Command, args []string) {
 	}
 	defer file.Close()
 
-	k := generate.NewKey()
+	k := generate.NewKey(rand.Reader)
 	enc := gob.NewEncoder(file)
 
 	if err = enc.Encode(k); err != nil {

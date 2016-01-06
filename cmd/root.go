@@ -24,7 +24,7 @@ import (
 	"fmt"
 	"os"
 
-	pkv "gopkg.in/mwmahlberg/pkv.v1/generate"
+	pkv "gopkg.in/mwmahlberg/pkv.v1/internal"
 
 	"github.com/spf13/cobra"
 )

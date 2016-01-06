@@ -17,18 +17,23 @@
 /*
 Package generate implements the generator part of pkv.
 */
-package generate
+package internal
 
 import (
-	"crypto/rand"
 	"encoding/binary"
 	"encoding/hex"
 	"errors"
 	"fmt"
 	"regexp"
 	"strings"
+	"io"
 
-	pkv "gopkg.in/mwmahlberg/pkv.v1/verify"
+	//	pkv "gopkg.in/mwmahlberg/pkv.v1/verify"
+)
+
+const (
+	minSeed = 1
+	maxSeed = 2097151
 )
 
 // The KeyMatrix is the private part of your product keys.
@@ -37,7 +42,7 @@ type KeyMatrix struct {
 }
 
 // NewKey generates a new KeyMatrix using sufficiently secure random numbers.
-func NewKey() KeyMatrix {
+func NewKey(rnd io.Reader) KeyMatrix {
 
 	pk := KeyMatrix{}
 	var m [][3]uint8
@@ -47,7 +52,7 @@ func NewKey() KeyMatrix {
 
 		rb := make([]byte, 3)
 
-		_, err := rand.Read(rb)
+		_, err := rnd.Read(rb)
 
 		m[i][0] = rb[0]
 		m[i][1] = rb[1]
@@ -67,16 +72,23 @@ func (pk *KeyMatrix) iv(k, v int) uint8 {
 }
 
 // GetKey generates a new product key based on the seed provided
-func (pk *KeyMatrix) GetKey(seed uint64) string {
+func (pk *KeyMatrix) GetKey(seed uint64) (string, error) {
+
+	if seed < minSeed {
+		return "", fmt.Errorf("invalid value for seed: %d (<%d)", seed, minSeed)
+	} else if seed > maxSeed {
+		return "", fmt.Errorf("invalid value for seed: %d (>%d)", seed, maxSeed)
+	}
+
 	k := make([]byte, 10)
 	binary.PutUvarint(k, seed)
 
-	k[3] = pkv.GetKeyByte(seed, pk.iv(0, 0), pk.iv(0, 1), pk.iv(0, 2))
+	k[3] = GetKeyByte(seed, pk.iv(0, 0), pk.iv(0, 1), pk.iv(0, 2))
 
-	k[4] = pkv.GetKeyByte(seed, pk.iv(1, 0), pk.iv(1, 1), pk.iv(1, 2))
-	k[5] = pkv.GetKeyByte(seed, pk.iv(2, 0), pk.iv(2, 1), pk.iv(2, 2))
-	k[6] = pkv.GetKeyByte(seed, pk.iv(3, 0), pk.iv(3, 1), pk.iv(3, 2))
-	cs := pkv.GetCheckSum(k[:7])
+	k[4] = GetKeyByte(seed, pk.iv(1, 0), pk.iv(1, 1), pk.iv(1, 2))
+	k[5] = GetKeyByte(seed, pk.iv(2, 0), pk.iv(2, 1), pk.iv(2, 2))
+	k[6] = GetKeyByte(seed, pk.iv(3, 0), pk.iv(3, 1), pk.iv(3, 2))
+	cs := GetCheckSum(k[:7])
 	k[7] = cs[0]
 	k[8] = cs[1]
 	k[9] = cs[2]
@@ -85,7 +97,7 @@ func (pk *KeyMatrix) GetKey(seed uint64) string {
 
 	re := regexp.MustCompile(".{4}")
 	parts := re.FindAllString(key, -1)
-	return strings.Join(parts, "-")
+	return strings.Join(parts, "-"), nil
 }
 
 // CheckCompleteKey validates each key part of a product key
@@ -104,10 +116,11 @@ func CheckCompleteKey(key string, matrix [][3]uint8) (err error) {
 	err = errors.New("invalid key")
 
 	for i := 0; i < 4; i++ {
-		if b[i+3] != pkv.GetKeyByte(d, matrix[i][0], matrix[i][1], matrix[i][2]) {
+		if b[i+3] != GetKeyByte(d, matrix[i][0], matrix[i][1], matrix[i][2]) {
 			return fmt.Errorf("invalid key %d", i+1)
 		}
 	}
 
 	return nil
 }
+

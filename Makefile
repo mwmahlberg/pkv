@@ -16,10 +16,11 @@ BUILD=$(CC) build $(CFLAGS)
 GENERATE=$(CC) generate
 INSTALL=$(CC) install
 CLEAN=$(CC) clean
+TEST=$(CC) test
 
-.PHONY: all clean build install commit
-	
-all: clean build
+.PHONY: ci clean build install test commit
+
+ci: clean cmd/bindata.go build test	
 	
 clean:
 	$(CLEAN)
@@ -34,4 +35,7 @@ build: cmd/bindata.go
 install: cmd/bindata.go
 	$(INSTALL)
 
-commit: clean cmd/bindata.go
+test:
+	$(TEST) -v -covermode=count -coverprofile coverage.out ./internal 
+	
+commit: clean cmd/bindata.go test

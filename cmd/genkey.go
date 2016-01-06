@@ -20,7 +20,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	pkv "gopkg.in/mwmahlberg/pkv.v1/generate"
+	pkv "gopkg.in/mwmahlberg/pkv.v1/internal"
 )
 
 var lseed *uint32
@@ -45,26 +45,26 @@ func init() {
 	// genkeyCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle" )
 
 	// BUG(mwmahlberg): We have to convert the seed and it's usages to uint32, not just the input
-	lseed = genkeyCmd.Flags().Uint32P("seed", "s", 0, "seed for key. Must be > 0")
+	lseed = genkeyCmd.Flags().Uint32P("seed", "s", 0, "seed for key. Must be > 0 and < 2097151")
 
 	genkeyCmd.Flags().StringVarP(&keyfile, "file", "f", defaultKeyfilePath, "path to keyfile")
-	//	t := *lseed
 }
 
 func genKey(cmd *cobra.Command, args []string) {
 	seed = uint64(*lseed)
 
-	if seed < 1 {
-		fmt.Println("Seed can not be smaller than 1!")
-		cmd.Usage()
-		os.Exit(0)
-	}
-
 	k := readKeyFile(keyfile)
 
 	pk := pkv.KeyMatrix{Matrix: k.Matrix}
 
-	s := pk.GetKey(uint64(*lseed))
+	s, err := pk.GetKey(uint64(seed))
+	
+	if err != nil {
+		fmt.Printf("Error while creating product key: %s\n",err)
+		cmd.Usage()
+		os.Exit(1)
+	}
+	
 	if err := pkv.CheckCompleteKey(s, k.Matrix); err != nil {
 		panic(err)
 	}

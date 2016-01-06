@@ -1,0 +1,12 @@
+language: go
+go:
+  - 1.5
+go_import_path: gopkg.in/mwmahlberg/pkv.v1
+before_install:
+  - go get github.com/mattn/goveralls
+install:
+  - go get -u github.com/jteeuwen/go-bindata/...
+  - go get -u "github.com/spf13/cobra"
+after_script:
+  - "$HOME/gopath/bin/goveralls -service=travis-ci -coverprofile=coverage.out"
+
