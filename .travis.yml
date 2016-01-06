@@ -2,3 +2,5 @@ language: go
 go:
   - 1.5
 go_import_path: gopkg.in/mwmahlberg/pkv.v1
+install:
+  - go get -u github.com/jteeuwen/go-bindata/...
