@@ -44,14 +44,14 @@ Use the `pkv.v1` command line tool inside your package directory.
 
  3. Import the package inside your code with an *absolute* import and check the product key:
  
-	package main
+        package main
 	
-	import (
-	    "fmt"
-		"example.com/cool/internal"
-	)
-		
-	func main() {
+        import (
+            "fmt"
+            "example.com/cool/internal"
+        )
+	
+        func main() {
 		var key       string = getKeyFromSomewhere()
 		var blacklist []uint64 = loadBlacklistFromServer()
 			
@@ -67,7 +67,7 @@ Use the `pkv.v1` command line tool inside your package directory.
 			panic(err)
 		}
 			
-	}
+        }
 	
  4. To generate a key, simply call `pkv.v1 genkey -s 123456`. The value for `-s` is called seed and identifies the generated key uniquely. Furthermore, this is the value you need to blacklist a product key. So make sure you keep track of the seed you used for generating a product key for a user! The combination of `pkv.key` and the seed can be used to regenerate a key.
 
