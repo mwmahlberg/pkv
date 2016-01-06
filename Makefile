@@ -18,9 +18,9 @@ INSTALL=$(CC) install
 CLEAN=$(CC) clean
 TEST=$(CC) test
 
-.PHONY: all clean build install test commit
-	
-all: clean test install
+.PHONY: ci clean build install test commit
+
+ci: clean cmd/bindata.go build test	
 	
 clean:
 	$(CLEAN)
@@ -36,6 +36,6 @@ install: cmd/bindata.go
 	$(INSTALL)
 
 test:
-	$(TEST) ./internal
+	$(TEST) -v -covermode=count -coverprofile coverage.out ./internal 
 	
 commit: clean cmd/bindata.go test
