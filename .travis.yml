@@ -4,3 +4,4 @@ go:
 go_import_path: gopkg.in/mwmahlberg/pkv.v1
 install:
   - go get -u github.com/jteeuwen/go-bindata/...
+  - go get -u "github.com/spf13/cobra"
