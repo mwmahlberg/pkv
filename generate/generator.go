@@ -31,6 +31,11 @@ import (
 	pkv "gopkg.in/mwmahlberg/pkv.v1/verify"
 )
 
+const (
+	minSeed = 1
+	maxSeed = 2097151
+)
+
 // The KeyMatrix is the private part of your product keys.
 type KeyMatrix struct {
 	Matrix [][3]uint8 `json:"matrix"`
@@ -67,7 +72,14 @@ func (pk *KeyMatrix) iv(k, v int) uint8 {
 }
 
 // GetKey generates a new product key based on the seed provided
-func (pk *KeyMatrix) GetKey(seed uint64) string {
+func (pk *KeyMatrix) GetKey(seed uint64) (string, error) {
+
+	if seed < minSeed {
+		return "", fmt.Errorf("invalid value for seed: %d (<%d)", seed, minSeed)
+	} else if seed > maxSeed {
+		return "", fmt.Errorf("invalid value for seed: %d (>%d)", seed, maxSeed)
+	}
+	
 	k := make([]byte, 10)
 	binary.PutUvarint(k, seed)
 
@@ -85,7 +97,7 @@ func (pk *KeyMatrix) GetKey(seed uint64) string {
 
 	re := regexp.MustCompile(".{4}")
 	parts := re.FindAllString(key, -1)
-	return strings.Join(parts, "-")
+	return strings.Join(parts, "-"), nil
 }
 
 // CheckCompleteKey validates each key part of a product key

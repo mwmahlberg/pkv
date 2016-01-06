@@ -53,19 +53,18 @@ func init() {
 func genKey(cmd *cobra.Command, args []string) {
 	seed = uint64(*lseed)
 
-	if seed < 1 {
-		fmt.Println("Seed can not be smaller than 1!")
-		cmd.Usage()
-		os.Exit(0)
-	} else if seed > 2097151 {
-		fmt.Println("Seed can not be greater than 2097151")
-	}
-
 	k := readKeyFile(keyfile)
 
 	pk := pkv.KeyMatrix{Matrix: k.Matrix}
 
-	s := pk.GetKey(uint64(*lseed))
+	s, err := pk.GetKey(uint64(seed))
+	
+	if err != nil {
+		fmt.Printf("Error while creating product key: %s\n",err)
+		cmd.Usage()
+		os.Exit(1)
+	}
+	
 	if err := pkv.CheckCompleteKey(s, k.Matrix); err != nil {
 		panic(err)
 	}
