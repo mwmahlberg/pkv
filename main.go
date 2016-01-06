@@ -1,5 +1,3 @@
-//go:generate go-bindata -o cmd/bindata.go -ignore .*_test.go -pkg cmd ./verify
-
 // Copyright ©2016 Markus W Mahlberg <markus@mahlberg.io>
 //
 //
@@ -15,14 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 package main
 
-import "github.com/mwmahlberg/pkv/cmd"
+import "gopkg.in/mwmahlberg/pkv.v1/cmd"
 
 /*
 pkv is a command line tool to manage and use Partial Key Verification.
-*/ 
+*/
 func main() {
 	cmd.Execute()
 }
