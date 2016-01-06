@@ -45,10 +45,9 @@ func init() {
 	// genkeyCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle" )
 
 	// BUG(mwmahlberg): We have to convert the seed and it's usages to uint32, not just the input
-	lseed = genkeyCmd.Flags().Uint32P("seed", "s", 0, "seed for key. Must be > 0")
+	lseed = genkeyCmd.Flags().Uint32P("seed", "s", 0, "seed for key. Must be > 0 and < 2097151")
 
 	genkeyCmd.Flags().StringVarP(&keyfile, "file", "f", defaultKeyfilePath, "path to keyfile")
-	//	t := *lseed
 }
 
 func genKey(cmd *cobra.Command, args []string) {
@@ -58,6 +57,8 @@ func genKey(cmd *cobra.Command, args []string) {
 		fmt.Println("Seed can not be smaller than 1!")
 		cmd.Usage()
 		os.Exit(0)
+	} else if seed > 2097151 {
+		fmt.Println("Seed can not be greater than 2097151")
 	}
 
 	k := readKeyFile(keyfile)
