@@ -14,9 +14,6 @@
 // limitations under the License.
 //
 
-/*
-Package generate implements the generator part of pkv.
-*/
 package internal
 
 import (
@@ -24,10 +21,9 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"io"
 	"regexp"
 	"strings"
-	"io"
-
 	//	pkv "gopkg.in/mwmahlberg/pkv.v1/verify"
 )
 
@@ -123,4 +119,3 @@ func CheckCompleteKey(key string, matrix [][3]uint8) (err error) {
 
 	return nil
 }
-

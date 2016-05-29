@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
 package cmd
 
 import (
@@ -66,7 +67,7 @@ func init() {
 
 }
 
-type Keychecker struct {
+type keychecker struct {
 	Iv  [3]uint8
 	Idx int
 }
@@ -81,17 +82,17 @@ func genCode(cmd *cobra.Command, args []string) {
 	p := filepath.Join(wd, "internal")
 
 	if stdout {
-		
+
 		data, _ := Asset("pkvtools.go")
 		fmt.Println(string(data))
-		
+
 	} else {
 		RestoreAsset(p, "pkvtools.go")
 	}
 
 	key := readKeyFile(keyfile)
 
-	kc := Keychecker{Idx: k - 1, Iv: key.Matrix[k-1]}
+	kc := keychecker{Idx: k - 1, Iv: key.Matrix[k-1]}
 
 	var out *os.File
 	var err error
