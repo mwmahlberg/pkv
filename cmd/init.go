@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
 package cmd
 
 import (
@@ -30,7 +31,7 @@ var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "initializes a matrix used for generating product keys",
 	Long: `In order to generate product keys, a secret matrix needs to be generated.
-This command creates this matrix by using securely generated random numbers. 
+This command creates this matrix by using securely generated random numbers.
 	`,
 	Run: initialize,
 }

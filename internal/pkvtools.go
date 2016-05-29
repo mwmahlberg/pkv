@@ -14,9 +14,6 @@
 // limitations under the License.
 //
 
-/*
-Verify provides the code to verify product keys.
-*/
 package internal
 
 import (
@@ -66,11 +63,11 @@ func checkKeyChecksumByte(k []byte) (err error) {
 // Note that this only validates wether the key was entered correctly,
 // not if it is a valid generated product key.
 func KeyChecksum(key string) (err error) {
-	
+
 	if len(key) != 24 {
 		return errors.New("invalid key length")
 	}
-	
+
 	k := strings.Replace(key, "-", "", -1)
 
 	b, err := hex.DecodeString(k)
@@ -107,7 +104,7 @@ func GetKeyByte(seed uint64, a, b, c uint8) byte {
 // KeyPart validates wether the chosen key part was generated with the KeyMatrix
 func KeyPart(key string, part int, f, s, t uint8, bl []uint64) (err error) {
 
-	if err := KeyChecksum(key); err != nil {
+	if err = KeyChecksum(key); err != nil {
 		return err
 	}
 
@@ -116,13 +113,13 @@ func KeyPart(key string, part int, f, s, t uint8, bl []uint64) (err error) {
 	// hex.decode was already tested at KeyChecksum
 	b, _ := hex.DecodeString(k)
 
-	d,_ := binary.Uvarint(b)
-	
-	for _,b := range bl {
+	d, _ := binary.Uvarint(b)
+
+	for _, b := range bl {
 		if d == b {
 			return errors.New("key blacklisted")
 		}
-	} 
+	}
 
 	err = errors.New("invalid key")
 	if b[part+3] != GetKeyByte(d, f, s, t) {

@@ -14,9 +14,7 @@
 // limitations under the License.
 //
 
-/*
-The cmd package contains the sources of the "pkv" utility and should not be imported.
-*/
+// Package cmd contains the sources of the "pkv" utility and should not be imported.
 package cmd
 
 import (
@@ -43,7 +41,7 @@ var (
 
 var ()
 
-// This represents the base command when called without any subcommands
+// RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "pkv",
 	Short: "product key generation",
@@ -57,7 +55,7 @@ you generate. Never publish it, and keep backups of it.
 `,
 }
 
-//Execute adds all child commands to the root command sets flags appropriately.
+// Execute adds all child commands to the root command sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd
 func Execute() {
 	if err := RootCmd.Execute(); err != nil {

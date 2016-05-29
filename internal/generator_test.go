@@ -30,7 +30,7 @@ func TestInvalidKey(t *testing.T) {
 	k := string(r)
 
 	if err := CheckCompleteKey(k, matrix.Matrix); err == nil {
-		t.Errorf("Invalid key '&s' was accepted", k)
+		t.Errorf("Invalid key '%s' was accepted", k)
 	}
 }
 
@@ -63,11 +63,11 @@ func TestSeedRange(t *testing.T) {
 	for i := minSeed; i <= maxSeed; i++ {
 		key, err := matrix.GetKey(uint64(i))
 		if err != nil {
-			t.Errorf("product key creation failed for seed %s: %v", i, err)
+			t.Errorf("product key creation failed for seed %d: %v", i, err)
 		}
 
 		if err := CheckCompleteKey(key, matrix.Matrix); err != nil {
-			t.Errorf("product key verification failed for seed %s:%v\nkey:%s", i, err, key)
+			t.Errorf("product key verification failed for seed %d:%v\nkey:%s", i, err, key)
 		}
 	}
 }

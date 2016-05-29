@@ -1,12 +1,12 @@
 package internal
 
 import (
-	"fmt"
 	"crypto/rand"
 	"encoding/hex"
+	"fmt"
 	"regexp"
-	"testing"
 	"strings"
+	"testing"
 )
 
 func TestKeyPartValid(t *testing.T) {
@@ -79,36 +79,35 @@ func TestInvalidKeyPart(t *testing.T) {
 
 	// Need to create a valid checksum, otherwise KeyPart will fail early
 	k := strings.Replace(string(r), "-", "", -1)
-	
+
 	buf, _ := hex.DecodeString(k)
-	
+
 	cs := GetCheckSum(buf[:7])
 	buf[7] = cs[0]
 	buf[8] = cs[1]
 	buf[9] = cs[2]
-	
+
 	tampered := fmt.Sprintf("%X", buf)
 
 	re := regexp.MustCompile(".{4}")
 	parts := re.FindAllString(tampered, -1)
-
 
 	if err := KeyPart(strings.Join(parts, "-"), 0, iv[0], iv[1], iv[2], []uint64{}); err == nil {
 		t.Error("Tampered key was accepted")
 	}
 }
 
-func TestChecksumInvalidKeyLength(t *testing.T){
+func TestChecksumInvalidKeyLength(t *testing.T) {
 	key := "1234-1234-1234-1234-123"
-	
-	if err := KeyChecksum(key ); err == nil {
+
+	if err := KeyChecksum(key); err == nil {
 		t.Error("Invalid key length was accepted")
 	}
 }
 
-func TestChecksumInvalidCharacter(t *testing.T){
+func TestChecksumInvalidCharacter(t *testing.T) {
 	key := "12#4-1234-1234-1234-123@"
-	
+
 	if err := KeyChecksum(key); err == nil {
 		t.Error("Invalid characters were accepted")
 	}

@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
 package cmd
 
 import (
@@ -58,13 +59,13 @@ func genKey(cmd *cobra.Command, args []string) {
 	pk := pkv.KeyMatrix{Matrix: k.Matrix}
 
 	s, err := pk.GetKey(uint64(seed))
-	
+
 	if err != nil {
-		fmt.Printf("Error while creating product key: %s\n",err)
+		fmt.Printf("Error while creating product key: %s\n", err)
 		cmd.Usage()
 		os.Exit(1)
 	}
-	
+
 	if err := pkv.CheckCompleteKey(s, k.Matrix); err != nil {
 		panic(err)
 	}
